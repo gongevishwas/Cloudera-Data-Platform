@@ -1,0 +1,97 @@
+********************************************************
+		Cloudera Data Platform
+********************************************************
+
+
+
+-----*** Update the server ***-----
+$ sudo apt-get update && sudo apt-get dist-upgrade -y
+
+
+-----*** Disable transparent huge pages ***-----
+
+$ sudo nano /etc/init.d/disable-transparent-hugepages
+
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          disable-transparent-hugepages
+# Required-Start:    $local_fs
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Disable Linux transparent huge pages
+# Description:       Disable Linux transparent huge pages, to improve
+#                    database performance.
+### END INIT INFO
+
+case $1 in
+  start)
+    if [ -d /sys/kernel/mm/transparent_hugepage ]; then
+      thp_path=/sys/kernel/mm/transparent_hugepage
+    elif [ -d /sys/kernel/mm/redhat_transparent_hugepage ]; then
+      thp_path=/sys/kernel/mm/redhat_transparent_hugepage
+    else
+      return 0
+    fi
+
+    echo 'never' > ${thp_path}/enabled
+    echo 'never' > ${thp_path}/defrag
+
+    unset thp_path
+    ;;
+esac
+
+$ sudo chmod 755 /etc/init.d/disable-transparent-hugepages
+
+$ sudo update-rc.d disable-transparent-hugepages defaults
+
+>>Restart server
+
+
+-----*** Install NTP ***-----
+$ sudo apt-get install ntp -y 
+
+
+-----*** Set Swappiness ***-----
+sudo sysctl -a | grep vm.swappiness
+sudo sysctl vm.swappiness=1
+echo 'vm.swappiness=1' | sudo tee --append /etc/sysctl.conf
+
+
+-----*** Install psycopg2 package ***-----
+
+$ sudo apt install python -y
+
+$ curl 'https://bootstrap.pypa.io/pip/2.7/get-pip.py' > get-pip.py && sudo python get-pip.py
+
+$ sudo pip install psycopg2==2.7.5 --ignore-installed
+
+
+
+
+-----*** Install and start CM ***-----
+
+$ wget https://archive.cloudera.com/cm7/7.4.4/cloudera-manager-installer.bin
+
+$ chmod u+x cloudera-manager-installer.bin
+
+$ sudo ./cloudera-manager-installer.bin
+
+
+
+# below screept is requred to add in addvoce options at the time of lountch 
+
+#!/bin/bash
+$ sudo apt install python -y
+$ curl 'https://bootstrap.pypa.io/pip/2.7/get-pip.py' > get-pip.py && sudo python get-pip.py - y
+$ sudo pip install psycopg2==2.7.5 --ignore-installed -y
+
+
+# at the time of cloudera manager configration requred to poot the instances private DNS as below. 
+
+# ip-172-31-18-150.us-west-2.compute.internal
+# ip-172-31-30-217.us-west-2.compute.internal
+# ip-172-31-27-133.us-west-2.compute.internal
+# ip-172-31-28-137.us-west-2.compute.internal
+# ip-172-31-27-97.us-west-2.compute.internal
+# ip-172-31-24-246.us-west-2.compute.internal
