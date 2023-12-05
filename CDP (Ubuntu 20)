@@ -79,7 +79,7 @@ $ sudo ./cloudera-manager-installer.bin
 
 
 
-# below screept is requred to add in addvoce options at the time of lountch 
+# below screept is requred to add in addvoce options at the time of lountch other instancess
 
 #!/bin/bash
 $ sudo apt install python -y
